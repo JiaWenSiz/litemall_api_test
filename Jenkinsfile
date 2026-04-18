@@ -2,6 +2,14 @@ pipeline {
     agent any
 
     stages {
+        // 1. 显式拉取代码（使用 SSH）
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        // 2. 运行测试
         stage('API Test') {
             steps {
                 sh '''
@@ -18,14 +26,18 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: 'report.html', fingerprint: true
-            publishHTML([
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: '.',
-                reportFiles: 'report.html',
-                reportName: 'Pytest 接口自动化测试报告'
-            ])
+            
+            // 3. 发布报告（修正语法）
+            publishHTML(
+                target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: '.',
+                    reportFiles: 'report.html',
+                    reportName: 'Pytest API Test Report'  // 改为英文
+                ]
+            )
         }
     }
 }
